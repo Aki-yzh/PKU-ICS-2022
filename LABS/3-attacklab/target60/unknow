@@ -1,0 +1,40 @@
+0000000000402162 <getbuf_withcanary>:
+  402162:	f3 0f 1e fa          	endbr64 
+  402166:	55                   	push   %rbp
+  402167:	48 89 e5             	mov    %rsp,%rbp
+  40216a:	48 81 ec 90 01 00 00 	sub    $0x190,%rsp
+  402171:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
+  402178:	00 00 
+  40217a:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+  40217e:	31 c0                	xor    %eax,%eax
+  402180:	c7 85 74 ff ff ff 00 	movl   $0x0,-0x8c(%rbp)
+  402187:	00 00 00 
+  40218a:	8b 85 74 ff ff ff    	mov    -0x8c(%rbp),%eax
+  402190:	89 85 70 ff ff ff    	mov    %eax,-0x90(%rbp)
+  402196:	48 8d 85 70 fe ff ff 	lea    -0x190(%rbp),%rax
+  40219d:	48 89 c7             	mov    %rax,%rdi
+  4021a0:	e8 e9 02 00 00       	callq  40248e <Gets>
+  4021a5:	8b 85 70 ff ff ff    	mov    -0x90(%rbp),%eax
+  4021ab:	48 63 d0             	movslq %eax,%rdx
+  4021ae:	48 8d 85 70 fe ff ff 	lea    -0x190(%rbp),%rax
+  4021b5:	48 8d 88 08 01 00 00 	lea    0x108(%rax),%rcx
+  4021bc:	48 8d 85 70 fe ff ff 	lea    -0x190(%rbp),%rax
+  4021c3:	48 89 ce             	mov    %rcx,%rsi
+  4021c6:	48 89 c7             	mov    %rax,%rdi
+  4021c9:	e8 a2 f1 ff ff       	callq  401370 <memcpy@plt>
+  4021ce:	8b 85 74 ff ff ff    	mov    -0x8c(%rbp),%eax
+  4021d4:	48 63 d0             	movslq %eax,%rdx
+  4021d7:	48 8d 85 70 fe ff ff 	lea    -0x190(%rbp),%rax
+  4021de:	48 8d 8d 70 fe ff ff 	lea    -0x190(%rbp),%rcx
+  4021e5:	48 81 c1 08 01 00 00 	add    $0x108,%rcx
+  4021ec:	48 89 c6             	mov    %rax,%rsi
+  4021ef:	48 89 cf             	mov    %rcx,%rdi
+  4021f2:	e8 79 f1 ff ff       	callq  401370 <memcpy@plt>
+  4021f7:	b8 01 00 00 00       	mov    $0x1,%eax
+  4021fc:	48 8b 55 f8          	mov    -0x8(%rbp),%rdx
+  402200:	64 48 2b 14 25 28 00 	sub    %fs:0x28,%rdx
+  402207:	00 00 
+  402209:	74 05                	je     402210 <getbuf_withcanary+0xae>
+  40220b:	e8 62 07 00 00       	callq  402972 <__stack_chk_fail>
+  402210:	c9                   	leaveq 
+  402211:	c3                   	retq   

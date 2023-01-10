@@ -1,0 +1,30 @@
+
+movq %rsp, %rax
+ret   48 89 e0
+
+movq %rax, %rdi
+ret   48 89 c7
+
+popq %rax
+ret    58
+
+
+movl %eax, %edx
+ret  89 c2
+
+
+movl %edx, %ecx
+ret   89 d1
+
+
+movl %ecx, %esi
+ret   89 ce
+
+
+lea    (%rdi,%rsi,1),%rax
+ret    
+
+#地址：0x4019a2
+movq %rax, %rdi
+ret   48 89 c7
+
