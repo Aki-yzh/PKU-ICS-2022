@@ -1,4 +1,3 @@
-//姓名 ：尹哲晖  学号 ：2100012821
 #include"cachelab.h"
 #include"contracts.h"
 #include<stdlib.h>
