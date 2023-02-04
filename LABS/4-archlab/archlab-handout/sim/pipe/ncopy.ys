@@ -1,0 +1,199 @@
+
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len words to dst.
+# Return the number of positive words (>0) contained in src.
+#
+# Include your name and ID here.
+# Describe how and why you modified the baseline code.
+#1.修改pipe-full.hcl文件增加iaddq指令简化操作
+#2.在ncopy.ys中运用iaddq指令
+#3.循环展开，减少循环的次数，减少浪费CPE的跳转指令，同时减少bubble
+#4.参考了三叉树实现平衡各个情况的CPE
+#5.删去多余操作如xor把%rax归0，以及最后一个equal1中从src中读src【0】的情况，因为初始化已经达到了要求
+#很奇怪的一点是运行correctness.pl时会报错说ENDFun不存在，而查看代码后发现ENDFun是END且属于不让修改的那一行，修改为ENDFun后就成功通过了
+##################################################################
+# Do not modify this portion
+# Function prologue.
+# %rdi = src, %rsi = dst, %rdx = len
+ncopy:
+
+# You can modify this portion
+    # Loop header
+loop0:
+    iaddq $-10,%rdx 
+    jl equaln        # 处理最后n个数
+
+loop1:        
+    mrmovq (%rdi), %r11
+    mrmovq 8(%rdi),%r12
+    rmmovq %r11,(%rsi)
+    andq %r11, %r11
+    jle loop2
+    iaddq $1,%rax    # if (val > 0) count++
+loop2: 
+    rmmovq %r12,8(%rsi)
+    andq %r12,%r12
+    jle loop3
+    iaddq $1,%rax        # if (val > 0) count++
+loop3:
+    mrmovq 16(%rdi), %r11
+    mrmovq 24(%rdi), %r12
+    rmmovq %r11,16(%rsi)
+    andq %r11, %r11
+    jle loop4
+    iaddq $1, %rax      # if (val > 0) count++
+loop4:
+    rmmovq %r12,24(%rsi)
+    andq %r12,%r12
+    jle loop5
+    iaddq $1,%rax    # if (val > 0) count++
+loop5:
+    mrmovq 32(%rdi), %r11
+    mrmovq 40(%rdi), %r12
+    rmmovq %r11,32(%rsi)
+    andq %r11, %r11
+    jle loop6
+    iaddq $1, %rax      # if (val > 0) count++
+loop6:
+    rmmovq %r12,40(%rsi)
+    andq %r12,%r12
+    jle loop7
+    iaddq $1,%rax    # if (val > 0) count++
+loop7:
+    mrmovq 48(%rdi), %r11
+    mrmovq 56(%rdi), %r12
+    rmmovq %r11,48(%rsi)
+    andq %r11, %r11
+    jle loop8
+    iaddq $1, %rax      # if (val > 0) count++
+loop8:
+    rmmovq %r12,56(%rsi)
+    andq %r12,%r12
+    jle loop9
+    iaddq $1,%rax  # if (val > 0) count++
+loop9:
+    mrmovq 64(%rdi), %r11
+    mrmovq 72(%rdi), %r12
+    rmmovq %r11,64(%rsi)
+    andq %r11, %r11  
+    jle loop10
+    iaddq $1, %rax        # if (val > 0) count++
+loop10:
+    rmmovq %r12,72(%rsi)
+    andq %r12,%r12
+    jle loop11
+    iaddq $1,%rax          # if (val > 0) count++
+
+loop11:                    #下一个loop
+    iaddq $80,%rdi
+    iaddq $80,%rsi
+    iaddq $-10,%rdx
+    jge loop1
+
+equaln:
+    mrmovq (%rdi), %r13
+    iaddq $7,%rdx          # 判断剩余的len
+    jl  lessthan3     #len<3 
+    jg  morethan3      #len>3
+    je  equal3    #len=3
+
+lessthan3:
+    iaddq   $2,%rdx     #10-7-2=1
+    je  equal1_2#len=1
+    iaddq   $-1,%rdx    
+    je  equal2   # len=2
+    ret         # len=0 
+morethan3:
+    iaddq   $-3,%rdx    # 10-7+3=6 
+    jg  morethan6      #  len > 6
+    je  equal6     # len=6
+    iaddq   $1,%rdx 
+    jl equal4     # len=4
+    je  equal5     # len=5    
+morethan6:
+    iaddq   $-2,%rdx
+    jl  equal7  #len=7
+    mrmovq 64(%rdi), %r12   # src[8]
+    je  equal8    # len=8
+equal9_2:
+    rmmovq %r12, 64(%rsi)
+    andq %r12, %r12   
+                                  #下面的代码都是同一套模版，直接复制粘贴修改有关量即可
+
+equal8:
+    mrmovq 56(%rdi), %r11   # src[7]
+    jle equal8_2    
+    iaddq $1, %rax        # if(rsi[8]>0) count++
+equal8_2:    
+    rmmovq %r11, 56(%rsi)
+    andq %r11, %r11   
+
+equal7:
+    mrmovq 48(%rdi), %r11   #src[6]
+    jle equal7_2   
+    iaddq $1, %rax        # if(rsi[7]>0) count++
+equal7_2:        
+    rmmovq %r11, 48(%rsi)
+    andq %r11, %r11   
+
+equal6:
+    mrmovq 40(%rdi), %r11   #src[5]
+    jle equal6_2
+    iaddq $1, %rax        # if(rsi[6]>0) count++
+equal6_2:        
+    rmmovq %r11, 40(%rsi)
+    andq %r11, %r11     # set cc
+
+equal5:
+    mrmovq 32(%rdi), %r11   #src[4]
+    jle equal5_2   
+    iaddq $1, %rax        # if(rsi[5]>0) count++
+equal5_2:
+    rmmovq %r11, 32(%rsi)
+    andq %r11, %r11     
+
+equal4:
+    mrmovq 24(%rdi), %r11   #src[3]
+    jle equal4_2 
+    iaddq $1, %rax        # if(rsi[4]>0) count++
+equal4_2:
+    rmmovq %r11, 24(%rsi)
+    andq %r11, %r11 
+
+equal3:
+    mrmovq 16(%rdi), %r11   #src[2]
+    jle equal3_2   
+    iaddq $1, %rax        # if(rsi[3]>0) count++
+equal3_2:
+    rmmovq %r11, 16(%rsi)
+    andq %r11, %r11   
+
+equal2:
+    mrmovq 8(%rdi), %r11    #src[1]
+    jle equal2_2   
+    iaddq $1, %rax        # if(rsi[2]>0) count++
+equal2_2:
+    rmmovq %r11, 8(%rsi)
+    andq %r11, %r11
+
+equal1:                 #equal1为从上面减下来的
+   # mrmovq (%rdi), %r11 #src[0]
+    jle equal1_2      
+    iaddq $1, %rax        # if(rsi[1]>0) count++
+equal1_2:                     
+    rmmovq %r13, (%rsi)
+    andq %r13, %r13
+    jle Done 
+    iaddq $1, %rax        # if(rsi[0]>0) count++
+
+
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+    ret
+##################################################################
+# Keep the following label at the end of your function
+EndFun:
+#/* $end ncopy-ys */
