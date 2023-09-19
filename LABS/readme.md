@@ -6,11 +6,11 @@
 4. archlab - 190.0/190.0
 5. cachelab - 60.0/60.0
 6. tshlab - 134.0/138.0
-7. malloclab - 103.0/120.0
+
 
 ---
 
 pf后开摆：
-
+7. malloclab - 103.0/120.0
 8. proxylab - 75.0/100.0
 ---
