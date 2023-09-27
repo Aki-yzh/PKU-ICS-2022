@@ -1,6 +1,6 @@
 /*
  * mm.c
- *尹哲晖 2100012821
+
  * 按照writeup提示在mm-text-book.c的基础上进行修改
  * 按照writeup中的提示参考了mm-naive.c
  * 使用分离式空闲链表进行存储
